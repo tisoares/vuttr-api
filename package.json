@@ -1,0 +1,93 @@
+{
+  "name": "vuttr-api",
+  "version": "0.0.0",
+  "description": "Base para Projetos",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "compile": "tsc",
+    "dev": "ts-node src/index.ts",
+    "postversion": "git push && git push --tags",
+    "prepare": "npm run build",
+    "start": "node lib/index.js",
+    "pretest": "set NODE_ENV=test&& sequelize db:migrate",
+    "test": "set NODE_ENV=test&& jest --no-cache --detectOpenHandles",
+    "test:watch": "test jest --coverage --watchAll",
+    "posttest": "set NODE_ENV=test&& sequelize db:migrate:undo:all"
+  },
+  "author": "Tiago Soares",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/bluebird": "^3.5.29",
+    "@types/body-parser": "^1.17.0",
+    "@types/cors": "^2.8.5",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^4.16.1",
+    "@types/factory-girl": "^5.0.2",
+    "@types/faker": "^4.1.9",
+    "@types/helmet": "0.0.43",
+    "@types/jest": "^25.1.2",
+    "@types/jsonwebtoken": "^8.3.2",
+    "@types/node": "^12.12.26",
+    "@types/supertest": "^2.0.8",
+    "@types/swagger-ui-express": "^3.0.1",
+    "@types/validator": "^12.0.1",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-node": "^9.0.1",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "factory-girl": "^5.0.4",
+    "faker": "^4.1.0",
+    "jest": "^25.1.0",
+    "prettier": "^1.19.1",
+    "sequelize-cli": "^5.5.1",
+    "source-map-support": "^0.5.16",
+    "sqlite3": "^4.1.1",
+    "supertest": "^4.0.2",
+    "ts-jest": "^25.2.0",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.0",
+    "helmet": "^3.18.0",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.1.0",
+    "pg": "^7.18.1",
+    "sequelize": "^5.21.3",
+    "swagger-ui-express": "^4.0.6"
+  },
+  "jest": {
+    "bail": true,
+    "clearMocks": true,
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/app/**/*.ts"
+    ],
+    "testRegex": "\\.test\\.ts",
+    "coverageDirectory": "coverage",
+    "transform": {
+      ".+\\.ts$": "ts-jest"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  }
+}

@@ -1,0 +1,452 @@
+swagger: '2.0'
+info:
+  title: SVN PARK
+  description: 'API criada pela Supervision para controle de parques de diversões'
+  version: 1.0.0
+  contact:
+    name: Tiago Soares
+    email: 'tisoares@outlook.com'
+basePath: /api
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: login
+    description: 'Login da API'
+  - name: allTools
+    description: 'Todas os models e rotas autorizadas'
+  - name: vendaIngresso
+    description: 'Inserir venda de ingressos'
+  - name: operador
+    description: 'Operadores do sistema'
+definitions:
+
+  Operador:
+    type: object
+    required:
+    - opeLogin
+    - opeNome
+    - opeEmail
+    - opeStatus
+    - opeTipo
+    properties:
+      opeID:
+        type: integer
+        format: int64
+      opeLogin:
+        type: string
+      opeNome: 
+        type: string
+      opeEmail: 
+        type: string
+      opeStatus: 
+        type: string
+      opeTipo: 
+        type: string
+  
+  VendaIngresso:
+    type: object
+    required:
+    - venCod
+    - venDate
+    - venTipo
+    - venPark
+    - venPDV
+    - venValidade
+    - venIngressos
+    properties:
+      venCod: 
+        type: string
+      venDate: 
+        type: string
+        format: dateTime
+      venTipo: 
+        type: string
+      venPark: 
+        type: string
+      venPDV: 
+        type: string
+      venValidade: 
+        type: string
+        format: dateTime
+      venIngressos: 
+        type: array
+        items:
+          type: object
+          required:
+          - ingCod
+          properties:
+            ingCod: 
+              type: string
+              
+  ResultVendaIngressos:
+    type: array
+    items:
+      type: object
+      properties:
+        ingCod: 
+          type: string
+        error:
+          type: object
+        ingID: 
+          type: integer
+          format: int64
+        
+  PagenedResult:
+    type: object
+    required:
+    - data
+    - countItems
+    - currentPage
+    - pageSize
+    - countPages
+    - hasPreviousPage
+    - hasNextPage
+    - nextPageNumber
+    - previousPageNumber
+    properties:
+      data:
+        type: array
+        items:
+          type: object
+      countItems: 
+        type: integer
+      currentPage: 
+        type: integer
+      pageSize: 
+        type: integer
+      countPages: 
+        type: integer
+      hasPreviousPage: 
+        type: boolean
+      hasNextPage: 
+        type: boolean
+      nextPageNumber: 
+        type: integer
+      previousPageNumber: 
+        type: integer
+  ErrorModel:
+    type: object
+    required:
+    - error
+    - message
+    - statusCode
+    properties:
+      error: 
+        type: string
+      message: 
+        type: string
+      statusCode: 
+        type: integer
+      errorDetail:
+        type: string
+      errorList: 
+        type: array
+        items:
+          type: object
+paths:
+  /login:
+    post:
+      tags:
+        - login
+      summary: Login do sistema
+      parameters:
+        - name: Dados Login
+          in: body
+          description: Dados de login.
+          required: true
+          schema:
+            type: object
+            required:
+            - opeLogin
+            - opePass
+            properties:
+              opeLogin:
+                type: string
+              opePass:
+                type: string
+      responses:
+        200:
+          description: Dados do operador e token de acesso
+          schema:
+            type: object
+            properties:
+              operador:
+                $ref: '#/definitions/Operador'
+              token:
+                type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+
+  /allTools:
+    get:
+      tags:
+        - allTools
+      summary: Retorna os todos os models e todas as rotas liberadas
+      parameters:
+        - $ref: '#/authTokenParam'
+      responses:
+        200:
+          description: Models e rotas autorizadas
+          schema:
+            type: object
+            properties:
+              models:
+                type: array
+                items:
+                  type: object
+              auth:
+                type: array
+                items:
+                  type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+ 
+  /vendaIngresso:
+    post:
+      tags:
+        - vendaIngresso
+      summary: Registra as vendas de Ingressos
+      parameters:
+        - name: item
+          in: body
+          description: Item to create.
+          required: true
+          schema:
+            $ref: '#/definitions/VendaIngresso'
+        - $ref: '#/authTokenParam'
+      responses:
+        200:
+          description: Array com os ingressos inseridos
+          schema:
+            $ref: '#/definitions/ResultVendaIngressos'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+      
+  /operador:
+    get:
+      tags:
+        - operador
+      summary: List
+      parameters:
+        - $ref: '#/currentPageParam'
+        - $ref: '#/pageSizeParam'
+        - $ref: '#/orderParam'
+        - $ref: '#/fieldsParam'
+        - $ref: '#/filterParam'
+        - $ref: '#/whereParam'
+        - $ref: '#/innerParam'
+        - $ref: '#/leftParam'
+        - $ref: '#/rightParam'
+        - $ref: '#/authTokenParam'
+      responses:
+        200:
+          description: Um array operadores sem paginação
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Operador'
+        201: 
+          description: Array de objetos paginados
+          schema:
+            $ref: '#/definitions/PagenedResult'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    post:
+      tags:
+        - operador
+      summary: Create
+      parameters:
+        - name: item
+          in: body
+          description: Item to create.
+          required: true
+          schema:
+            $ref: '#/definitions/Operador'
+        - $ref: '#/authTokenParam'
+      responses:
+        200:
+          description: Identifier of created item.
+          schema:
+            type: integer
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  
+  '/operador/tools':
+    get:
+      tags:
+        - operador
+      summary: Retorna s model e todas as rotas liberadas
+      parameters:
+        - $ref: '#/authTokenParam'
+      responses:
+        200:
+          description: Model e rotas autorizadas
+          schema:
+            type: object
+            properties:
+              model:
+                type: array
+                items:
+                  type: object
+              auth:
+                type: array
+                items:
+                  type: object
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  
+  '/operador/{id}':
+    put:
+      tags:
+        - operador
+      summary: Update
+      parameters:
+        - name: id
+          in: path
+          description: Identifier for item.
+          required: true
+          type: string
+        - name: item
+          in: body
+          description: Properties of item to update.
+          required: true
+          schema:
+            $ref: '#/definitions/Operador'
+        - $ref: '#/authTokenParam'
+      responses:
+        '200':
+          description: Number of affected rows.
+          schema:
+            type: integer
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  
+    delete:
+      tags:
+        - operador
+      summary: Delete
+      parameters:
+        - name: id
+          in: path
+          description: Identifier for item.
+          required: true
+          type: string
+        - $ref: '#/authTokenParam'
+      responses:
+        '200':
+          description: Number of affected rows.
+          schema:
+            type: integer
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+            
+currentPageParam:
+  name: currentPage
+  in: query
+  description: Número da pagina que deseja consultar.
+  required: false
+  type: integer
+  format: int32
+pageSizeParam:
+  name: pageSize
+  in: query
+  description: Número de registros por pagina que deseja consultar.
+  required: false
+  type: integer
+  format: int32
+orderParam:  
+  name: order
+  in: query
+  description: 'Campo que deseja ordernar. Usar "!" no começo caso queira em ordem decrescente Ex: opeID ou !opeID' 
+  required: false
+  type: string
+fieldsParam:
+  name: fields
+  in: query
+  description: 'Campo que deseja consultar separador por virgula. Ex.: opeID, opeNome' 
+  required: false
+  type: string
+filterParam:
+  name: filter
+  in: query
+  description: 'Valor que deseja filtrar nos campos filtraveis.' 
+  required: false
+  type: string
+whereParam:
+  name: where
+  in: query
+  description: '<h3>Condições para conulta.</h3>
+  Formato das clausulas: <b>(CAMPO, CONDIÇÃO, VALOR)</b></br>
+  <b>Condições:</b>
+  <ul>
+  <li><b>cs</b> - Contém a string</li>
+  <li><b>sw</b> - Contém a String no inicio</li>
+  <li><b>ew</b> - Contém a string no final</li>
+  <li><b>eq</b> - Igual o valor</li>
+  <li><b>lt</b> - Valores Maiores</li>
+  <li><b>le</b> - Valor maior ou igual</li>
+  <li><b>ge</b> - Valor menor ou igual</li>
+  <li><b>gt</b> - Valor menor</li>
+  <li><b>bt</b> - Entre dois valores. <b>Ex.: (opeID,bt,5,10)</b></li>
+  <li><b>in</b> - Contenham em um conjunto de valores. <b>Ex.: (opeID,in,5,6,7,10)</b></li>
+  <li><b>is</b> - Valores Nulos (não precisa passar VALOR. <b>Ex.: (opeNome,is)</b></li>
+  </ul>
+  Adicione <b>"n"</b> no inicio da CONDIÇÃO para fazer <b>NOT. Ex.: (opeID,neq,4)</b></br>
+  Utilizar <b>";"</b> para <b>AND</b> e <b>"|"</b> para <b>OR</b></br>
+  <b>Ex.:</b> (opeID,neq,4);(opeNome,is)' 
+  required: false
+  type: string
+innerParam:
+  name: inner
+  in: query
+  description: 'Faz um INNER join com as tabelas.</br>
+    Deve ser informado o nome da <b>TABELA</b> ou os parametros de reacionamento <b>(TABELA,CAMPO,CAMPO RELACIONAL)</b> e devem ser separados por <b>";"</b> para mais de um relacionamento</br> 
+    Exemplos de consulta de ingresso com park e categoria:</br>Informando os campos: <b>(park,parID,ingParID);(categoria,catID,ingCatID)</b></br>Sem informar os campos quando o model está configurado: <b>park;categora</b></br>
+    Ou mesclando os dois: <b>park;(categoria,catID,ingCatID)</b>' 
+  required: false
+  type: string
+leftParam: 
+  name: left
+  in: query
+  description: 'Faz um LEFT join com as tabelas.</br>
+    Deve ser informado o nome da <b>TABELA</b> ou os parametros de reacionamento <b>(TABELA,CAMPO,CAMPO RELACIONAL)</b> e devem ser separados por <b>";"</b> para mais de um relacionamento</br> 
+    Exemplos de consulta de ingresso com park e categoria:</br>Informando os campos: <b>(park,parID,ingParID);(categoria,catID,ingCatID)</b></br>Sem informar os campos quando o model está configurado: <b>park;categora</b></br>
+    Ou mesclando os dois: <b>park;(categoria,catID,ingCatID)</b>' 
+  required: false
+  type: string
+rightParam:
+  name: right
+  in: query
+  description: 'Faz um RIGHT join com as tabelas.</br>
+    Deve ser informado o nome da <b>TABELA</b> ou os parametros de reacionamento <b>(TABELA,CAMPO,CAMPO RELACIONAL)</b> e devem ser separados por <b>";"</b> para mais de um relacionamento</br> 
+    Exemplos de consulta de ingresso com park e categoria:</br>Informando os campos: <b>(park,parID,ingParID);(categoria,catID,ingCatID)</b></br>Sem informar os campos quando o model está configurado: <b>park;categora</b></br>
+    Ou mesclando os dois: <b>park;(categoria,catID,ingCatID)</b>' 
+  required: false
+  type: string  
+authTokenParam:
+  name: Authorization
+  in: header
+  description: Adicione o texto <b>"Bearer "</b> e depois o token retornado do login
+  required: true
+  type: string

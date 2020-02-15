@@ -1,0 +1,12 @@
+### Comandos sequelize Sequelize
+# Criar migration
+npx sequelize migration:create --name=create-users
+
+# Executa migrations
+npx sequelize db:migrate
+
+# Rollback ultima migration
+npx sequelize db:migrate:undo
+
+# Rollback todas migrations
+npx sequelize db:migrate:undo:all
