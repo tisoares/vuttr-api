@@ -1,4 +1,4 @@
-import { Router, Response } from 'express'
+import { Router } from 'express'
 
 import '../config/bootstrap.js' // load .env config
 
@@ -23,6 +23,11 @@ if (process.env.CFG_DISABLE_TOKEN === 'true' || process.env.NODE_ENV === 'test')
 routes.use(AuthorizationTokenRoute.midTokenAuth)
 // Todas as rotas a partir deste ponto está validada com token
 
-routes.put('/users/:id', (_req, res): Response => res.status(400).json(null))
+// #region Rotas de Usuer
+routes.put('/users/:id', UserController.update)
+routes.delete('/users/:id', UserController.destroy)
+routes.get('/users/:id', UserController.indexOne)
+routes.get('/users/', UserController.indexAll)
+// #endregion
 
 export default routes
